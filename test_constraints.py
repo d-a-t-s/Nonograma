@@ -1,6 +1,6 @@
 import pytest
 
-from constraints import constraints
+from Constraints import constraints
 
 m1 = [[True, False, True],
       [False, False, True],

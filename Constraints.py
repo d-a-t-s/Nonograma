@@ -1,2 +1,2 @@
 def constraints(matriz):
-    return None
+    return matriz
