@@ -13,8 +13,8 @@ def test_column_has_true():
     for j in range(n):
         assert any(board[i][j] for i in range(n))
 
-def test_row_has_true(n):
+def test_row_has_true():
     n = 6
-    board = createBoard()
+    board = createBoard(n)
     for row in board:
         assert any(row)
