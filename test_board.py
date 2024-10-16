@@ -10,3 +10,8 @@ def test_column_has_true():
     board = createBoard()
     for j in range(5):
         assert any(board[i][j] for i in range(5))
+
+def test_row_has_true():
+    board = createBoard()
+    for row in board:
+        assert any(row)
