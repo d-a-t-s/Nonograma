@@ -3,6 +3,8 @@ import pygame.freetype
 import createBoard
 import Constraints
 
+from NonogramSolver import *
+
 def draw_board(surface, board, cell_size):
     for row in range(len(board)):
         for col in range(len(board[row])):
@@ -34,8 +36,15 @@ window_size = grid_size * cell_size
 window = pygame.display.set_mode((window_size + cell_size, window_size + cell_size))
 clock = pygame.time.Clock()
 board = [[False for i in range(grid_size)] for i in range(grid_size)]
+
 solutionBoard = createBoard.createBoard(grid_size)
 constraints = Constraints.constraints(solutionBoard)
+
+nonogram = Nonogram(constraints[0],constraints[1])
+while not nonogram.solve():
+    solutionBoard = createBoard.createBoard(grid_size)
+    constraints = Constraints.constraints(solutionBoard)
+    nonogram = Nonogram(constraints[0],constraints[1])
 
 running = True
 while running:
