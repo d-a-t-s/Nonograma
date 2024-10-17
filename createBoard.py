@@ -1,7 +1,9 @@
 import random as rn
 
 def createBoard(num):
-    board = list(map(lambda x: list(map(lambda x: rn.choice([True, False]), range(num))), range(num)))
+    board = list(list(rn.choice([True, False])
+                    for j in range(num))
+                for i in range(num))
 
     #Ensure that each column has at least one True
     for j in range(num):
