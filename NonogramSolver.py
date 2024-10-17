@@ -18,12 +18,6 @@ class Nonogram:
             for v in self.model:
                 current_solution.append(v() != self.model[v])
             self.solver.add(z3.Or(current_solution))
-
-            with open("currentsolution.txt", "a") as fp:
-                fp.write("Test:\n%s\n" % current_solution)
-            #   f = open("currentsolution.txt", "a")
-            #   f.write(current_solution)
-            #   f.close
             if self.solver.check() == z3.sat:
                 return False #Not an unique solution
             else:
