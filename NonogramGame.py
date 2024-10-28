@@ -36,7 +36,6 @@ window_size = grid_size * cell_size
 window = pygame.display.set_mode((window_size + cell_size, window_size + cell_size))
 clock = pygame.time.Clock()
 board = [[False for i in range(grid_size)] for i in range(grid_size)]
-
 solutionBoard = createBoard.createBoard(grid_size)
 constraints = Constraints.constraints(solutionBoard)
 
