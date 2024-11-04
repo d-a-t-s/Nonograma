@@ -1,72 +1,56 @@
 import pygame
 import pygame.freetype
-import createBoard
-import Constraints
 from MenuEsc import menuEsc
 from MenuWin import win
 from math import *
+from BaseButton import Button
 
+from ColorNonoBoard import *
 from NonogramSolver import *
 
-def draw_board(surface, colored_board, cell_size, zoom, offset_x, offset_y, font):
+def draw_board(surface, colored_board, cell_size, zoom, offset_x, offset_y, palette):
     for row in range(len(colored_board)):
         for col in range(len(colored_board[row])):
-            if colored_board[row][col] == 2:
-                color = (255, 255, 255)
-
-                rect = pygame.draw.rect(surface, color, ((col * cell_size * zoom + 1) + offset_x, (row * cell_size * zoom + 1) + offset_y, cell_size * zoom - 2, cell_size * zoom - 2))
-                x = font.get_rect("X", 0, 0, rect.height)
-                height = floor((rect.height / x.width) * rect.height)
-                x = font.get_rect("X", 0, 0, floor((rect.height / x.width) * rect.height))
-
-                font.render_to(surface, (rect.x + (rect.width - x.width) / 2, rect.y + (rect.height - x.height) / 2), None, (150, 0, 0), None, 0, 0, height)
-
-            elif colored_board[row][col] == 1:
-                color = (0, 0, 0)
-                pygame.draw.rect(surface, color, ((col * cell_size * zoom + 1) + offset_x, (row * cell_size * zoom + 1) + offset_y, cell_size * zoom - 2, cell_size * zoom - 2))
-
-            elif colored_board[row][col] == 0:
-                color = (255, 255, 255)
-                pygame.draw.rect(surface, color, ((col * cell_size * zoom + 1) + offset_x, (row * cell_size * zoom + 1) + offset_y, cell_size * zoom - 2, cell_size * zoom - 2))
+            pygame.draw.rect(surface, palette[colored_board[row][col]], ((col * cell_size * zoom + 1) + offset_x, (row * cell_size * zoom + 1) + offset_y, cell_size * zoom - 2, cell_size * zoom - 2))
 
 
-def draw_borders(surface, constraints, col_cells, row_cells, grid_size, cell_size, font, zoom, offset_x, offset_y, img):
+def draw_borders(surface, col_constraint, row_constraint,max_c_cols, max_c_rows, grid_cols, grid_rows, cell_size, font, zoom, offset_x, offset_y, palette , img):
     zoom_num = 1 if zoom > 1 else zoom
     col = 0
     row = 0
-    aux_offset_x = offset_x if offset_x >= cell_size * row_cells * zoom_num else min(cell_size * row_cells * zoom, cell_size * row_cells)
-    aux_offset_y = offset_y if offset_y >= cell_size * col_cells * zoom_num else min(cell_size * col_cells * zoom, cell_size * col_cells)
+    aux_offset_x = offset_x if offset_x >= cell_size * max_c_rows * zoom_num else min(cell_size * max_c_rows * zoom, cell_size * max_c_rows)
+    aux_offset_y = offset_y if offset_y >= cell_size * max_c_cols * zoom_num else min(cell_size * max_c_cols * zoom, cell_size * max_c_cols)
 
-    col_banner = pygame.Rect(0, 0, max(0, min(surface.get_width(), offset_x + grid_size * cell_size * zoom)), min(surface.get_height(), aux_offset_y))
-    row_banner = pygame.Rect(0, 0, min(surface.get_width(), aux_offset_x), max(0, min(surface.get_height(), offset_y + grid_size * cell_size * zoom)))
+    col_banner = pygame.Rect(0, 0, max(0, min(surface.get_width(), offset_x + grid_cols * cell_size * zoom)), min(surface.get_height(), aux_offset_y))
+    row_banner = pygame.Rect(0, 0, min(surface.get_width(), aux_offset_x), max(0, min(surface.get_height(), offset_y + grid_rows * cell_size * zoom)))
     col_panel = surface.subsurface(col_banner)
     row_panel = surface.subsurface(row_banner)
 
     col_panel.blit(img, (0, 0))
     row_panel.blit(img, (0, 0))
 
-    for i in constraints[0]:
-        aux = col_cells
+    for i in col_constraint:
+        aux = max_c_cols
         for j in i[::-1]:
             aux -= 1
-            test = pygame.Rect((offset_x + col * cell_size * zoom + 1, (aux_offset_y - cell_size * zoom_num * (col_cells - aux)), cell_size * zoom - 2, cell_size * zoom_num))
-            pygame.draw.rect(surface,(0,0,135), test)
-            test2 = font.get_rect("%s" % j,0,0,(cell_size) * zoom_num)
+            test = pygame.Rect((offset_x + col * cell_size * zoom + 1, (aux_offset_y - cell_size * zoom_num * (max_c_cols - aux)), cell_size * zoom - 2, cell_size * zoom_num))
+            pygame.draw.rect(surface,palette[j[1]], test)
+            test2 = font.get_rect("%s" % j[0],0,0,(cell_size) * zoom_num)
             if test2.width > cell_size * zoom_num:
                 font.render_to(surface, (test.x + (test.width - ((cell_size - 2) * zoom_num)) // 2, test.y + ((test.height - floor(((cell_size - 2) * zoom_num / test2.width) * (cell_size - 2) * zoom_num)) // 2)), None, (255, 255, 255), None, 0, 0, floor(((cell_size - 2) * zoom_num / test2.width) * (cell_size - 2) * zoom_num))
             else:
                 font.render_to(surface, (test.x + (test.width - test2.width) // 2, test.y + ((test.height - test2.height) // 2)), None, (255, 255, 255), None, 0, 0, cell_size * zoom_num)
         col +=1
 
-    for i in constraints[1]:
-        aux = row_cells
+    for i in row_constraint:
+        aux = max_c_rows
         for j in i[::-1]:
             aux -= 1
-            test4 = pygame.Rect((aux_offset_x - cell_size * zoom_num * (row_cells - aux)), offset_y + row * cell_size * zoom + 1,  cell_size * zoom_num, cell_size * zoom - 2)
-            pygame.draw.rect(surface,(0,0,135), test4)
-            test5 = font.get_rect("%s" % j,0,0,cell_size * zoom_num)
+            test4 = pygame.Rect((aux_offset_x - cell_size * zoom_num * (max_c_rows - aux)), offset_y + row * cell_size * zoom + 1,  cell_size * zoom_num, cell_size * zoom - 2)
+            pygame.draw.rect(surface,palette[j[1]], test4)
+            test5 = font.get_rect("%s" % j[0],0,0,cell_size * zoom_num)
             if test5.width > cell_size * zoom_num:
-                font.render_to(surface, (test4.x + (test4.width - ((cell_size - 2) * zoom_num)) // 2, test4.y + ((test4.height - floor(((cell_size - 2) * zoom_num / test2.width) * (cell_size - 2) * zoom_num)) // 2)), None, (255, 255, 255), None, 0, 0, floor(((cell_size - 2) * zoom_num / test5.width) * (cell_size - 2) * zoom_num))
+                font.render_to(surface, (test4.x + (test4.width - ((cell_size - 2) * zoom_num)) // 2, test4.y + ((test4.height - floor(((cell_size - 2) * zoom_num / test5.width) * (cell_size - 2) * zoom_num)) // 2)), None, (255, 255, 255), None, 0, 0, floor(((cell_size - 2) * zoom_num / test5.width) * (cell_size - 2) * zoom_num))
             else:
                 font.render_to(surface, (test4.x + ((test4.width - test5.width) // 2), test4.y + ((test4.height - test5.height) // 2)), None, (255, 255, 255), None, 0, 0, cell_size * zoom_num)
         row +=1
@@ -77,67 +61,69 @@ def draw_borders(surface, constraints, col_cells, row_cells, grid_size, cell_siz
 
     
           
-def handle_click(pos, type, board, Colored_board, cell_size, zoom, offset_x, offset_y):
+def handle_click(pos, color, Colored_board, cell_size, zoom, offset_x, offset_y):
     row = (floor((pos[1] - offset_y) / (cell_size * zoom)))
     col = (floor((pos[0] - offset_x) / (cell_size * zoom)))
-    if 0 <= row < len(board) and 0 <= col < len(board[row]):
-        if type == 1:
-            board[row][col] = not board[row][col]
-            if Colored_board[row][col] != 1:
-                Colored_board[row][col] = 1
-            else:
-                Colored_board[row][col] = 0
-        elif type == 3:
-            board[row][col] = False
-            if Colored_board[row][col] != 2:
-                Colored_board[row][col] = 2
-            else:
-                Colored_board[row][col] = 0
+    if 0 <= row < len(Colored_board) and 0 <= col < len(Colored_board[row]):
+        Colored_board[row][col] = color
 
-def max_number_contraints(constraints):
+def max_number_contraints(col_constraint, row_constraint):
     max_constraints_cols = 0
     max_constraints_rows = 0
-    for i in constraints[0]:
+    for i in col_constraint:
         max_constraints_cols = max(len(i),max_constraints_cols)
-    for i in constraints[1]:
+    for i in row_constraint:
         max_constraints_rows = max(len(i),max_constraints_rows)
 
     return max_constraints_cols, max_constraints_rows
 
-def check(board, solution_board):
-    for i in range(len(solution_board)):
-        for j in range(len(solution_board[0])):
-            if ((not solution_board[i][j]) and board[i][j]):
+def check(board_solved, colored_board,palette):
+    x = len(palette)-1
+    for i in range(len(board_solved)):
+        for j in range(len(board_solved[0])):
+            if ((board_solved[i][j] != colored_board[i][j])) and (colored_board[i][j] != x):
                 return False
     return True
 
+def color_selection(window_size, palette):
+    button_size = window_size[1] // 16
+    buttons = []
+    for i in range(len(palette)):
+        buttons.append(Button(palette[i], (window_size[1] // 24) * (i+1) + button_size * (i), (window_size[1] - window_size[1] // 8) + button_size - button_size // 2, button_size, button_size))
 
-def game(window, window_size, font, clock, grid_size):
-    cell_size = 50
+    return buttons
+
+
+def game(window, window_size, font, clock):
+    cell_size = 20
     zoom = 1
     zoom_min = 0.1
     zoom_max = 3
     zoom_step = 0.01
+    selected_color = 5
+    board_solved = []
+    palette = []
 
     solved = False
     dragging = False
     panel = pygame.Surface(window_size)
     img = pygame.image.load('bg_nonogram.png')
     panel.blit(img, (0, 0))
-    colored_board = [[0 for i in range(grid_size)] for i in range(grid_size)]
-    board = [[False for i in range(grid_size)] for i in range(grid_size)]
 
-    solutionBoard = createBoard.createBoard(grid_size)
-    constraints = Constraints.constraints(solutionBoard)
+    palette, col_constraint, row_constraint, board_solved = board_colored_nono()
 
-    nonogram = Nonogram(constraints[0],constraints[1])
-    while not nonogram.solve():
-        solutionBoard = createBoard.createBoard(grid_size)
-        constraints = Constraints.constraints(solutionBoard)
-        nonogram = Nonogram(constraints[0],constraints[1])
-    max_constraints_cols, max_constraints_rows = max_number_contraints(constraints)
-    offset_x = max(cell_size * max_constraints_rows, (window_size[0] - cell_size * grid_size) // 2)
-    offset_y = max(cell_size * max_constraints_cols, (window_size[1] - cell_size * grid_size) // 2)
+    grid_cols = len(col_constraint)
+    grid_rows = len(row_constraint)
+    palette.append((255,255,255))
+    colored_board = [[len(palette) - 1 for i in range(grid_cols)] for i in range(grid_rows)]
+
+    buttons = color_selection(window_size, palette)
+    #panel_buttons = pygame.Surface((window_size[0], window_size[1] // 8))
+    #window.blit(panel, (0, window_size[1] - window_size[1] // 8))
+
+    max_constraints_cols, max_constraints_rows = max_number_contraints(col_constraint, row_constraint)
+    offset_x = max(cell_size * max_constraints_rows, (window_size[0] - cell_size * grid_cols) // 2)
+    offset_y = max(cell_size * max_constraints_cols, (window_size[1] - cell_size * grid_rows) // 2)
 
     check_panel = pygame.Surface((window_size[0] // 4, window_size[1] // 16), pygame.SRCALPHA)
     text_wrong = font.render("There is something wrong...", (255, 255 ,255), None, 0, 0, 20)
@@ -147,18 +133,20 @@ def game(window, window_size, font, clock, grid_size):
     while running:
         clock.tick(60)
         for event in pygame.event.get():
+            pos = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
                 pygame.quit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    for i in buttons:
+                        if i.isOver(pos):
+                            selected_color = palette.index(i.color)
 
                 if event.button == 2: #boton central
                     dragging = True
                     last_mouse_pos = event.pos
                     panel.blit(img, (0, 0))
-                    
-                elif event.button == 3 and not solved:
-                    handle_click(event.pos, 3, board, colored_board, cell_size, zoom, offset_x, offset_y)#3 para boton derecho cambiar por algo legible
                     
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
@@ -170,17 +158,17 @@ def game(window, window_size, font, clock, grid_size):
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1 and not solved:
-                    handle_click(event.pos, 1, board, colored_board, cell_size, zoom, offset_x, offset_y)#1 para boton izquierdo cambiar por algo legible
-                    if board == solutionBoard:
+                    handle_click(event.pos, selected_color, colored_board, cell_size, zoom, offset_x, offset_y)#1 para boton izquierdo cambiar por algo legible
+                    if colored_board == board_solved:
                         solved = True
                         quited = win(window, window_size, font, clock)
                     else:
                         solved = False
                         quited = False
-                    
+
                     if quited:
                         running = False
-
+                
                 if event.button == 2:  # Boton central
                     dragging = False
 
@@ -209,10 +197,10 @@ def game(window, window_size, font, clock, grid_size):
                         running = False
                 elif event.key == pygame.K_SPACE:
                     panel.blit(img, (0, 0))
-                
+                    
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if not check(board, solutionBoard):
+                    if not check(board_solved, colored_board,palette):
                         check_panel.fill((0, 0, 0, 0))
                         check_panel.blit(text_wrong[0], ((check_panel.get_width() // 2) - text_wrong[1].width // 2, check_panel.get_height() // 2 - text_wrong[1].height // 2))
                         pygame.draw.rect(panel, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
@@ -223,8 +211,11 @@ def game(window, window_size, font, clock, grid_size):
                         pygame.draw.rect(panel, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
                         panel.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
 
-        draw_board(panel, colored_board, cell_size, zoom, offset_x, offset_y, font)
-        draw_borders(panel, constraints, max_constraints_cols, max_constraints_rows, grid_size, cell_size, font, zoom, offset_x, offset_y, img)
-
+                    
+        #panel.blit(panel_buttons, (0, window_size[1] - window_size[1] // 8))
+        draw_board(panel, colored_board, cell_size, zoom, offset_x, offset_y, palette)
+        draw_borders(panel, col_constraint, row_constraint, max_constraints_cols, max_constraints_rows, grid_cols, grid_rows, cell_size, font, zoom, offset_x, offset_y,palette ,img)
+        for i in buttons:
+            i.draw(panel, True)
         window.blit(panel, (0, 0))
         pygame.display.flip()
