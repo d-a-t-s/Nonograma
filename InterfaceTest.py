@@ -1,5 +1,6 @@
 import pygame, pygame.freetype, sys
 from MenuBool import menuBool
+from ColorNono import game
 from BaseButton import Button
 
 def main_menu():
@@ -11,13 +12,15 @@ def main_menu():
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
 
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if start_button.isOver(pos):
                     menuBool(window, window_size, font, clock)
                     window.blits(blit_sequence=((img_menu, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, (window_size[1] // 8) + 5)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, window_size[1] // 8))))
 
                 elif colored_button.isOver(pos):
-                    continue
+                    game(window, window_size, font, clock)
+                    window.blits(blit_sequence=((img_menu, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, (window_size[1] // 8) + 5)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, window_size[1] // 8))))
+
                 
                 elif exit_button.isOver(pos):
                     running = False
