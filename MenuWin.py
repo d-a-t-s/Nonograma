@@ -10,13 +10,13 @@ def win(window, window_size, font, clock):
     panel = pygame.Surface(window_size, pygame.SRCALPHA)
     win = pygame.Surface((window_size[0] // 2, window_size[1] // 2), pygame.SRCALPHA)
     win.fill((0, 0, 0, 0))
-    bg_win = font.render("WIN", BLACK, None, 0, 0, window_size[0] // 4)
+    bg_win = font.render("WIN", (173, 146, 50), None, 0, 0, window_size[0] // 4)
     fg_win = font.render("WIN", YELLOW, None, 0, 0, window_size[0] // 4)
-    win.blits(blit_sequence=((bg_win[0], ((win.get_width() - bg_win[1].width) // 2, 25)), (fg_win[0], ((win.get_width() - fg_win[1].width) // 2, 20))))
+    win.blits(blit_sequence=((bg_win[0], ((win.get_width() - bg_win[1].width) // 2 - 5, 15)), (fg_win[0], ((win.get_width() - fg_win[1].width) // 2, 20))))
     
     button_size = (window_size[0]//6, window_size[1]//8)
-    resume_button = Button(WHITE, (window_size[0] // 2 - button_size[0] * 1.2), button_size[1] * 4.5, button_size[0], button_size[1], "RESUME")
-    quit_button = Button(WHITE, (window_size[0] // 2 + button_size[0] * 0.2), button_size[1] * 4.5, button_size[0], button_size[1], "QUIT")
+    resume_button = Button(WHITE, (window_size[0] // 2 + button_size[0] * 0.2), button_size[1] * 4.5, button_size[0], button_size[1], "RESUME")
+    quit_button = Button(WHITE, (window_size[0] // 2 - button_size[0] * 1.2), button_size[1] * 4.5, button_size[0], button_size[1], "QUIT")
 
     panel.fill((0, 0, 0, 3))
     panel.blit(win, (window_size[0] // 4, window_size[1] // 4))
