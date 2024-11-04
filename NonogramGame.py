@@ -14,13 +14,13 @@ def draw_board(surface, board, cell_size):
             pygame.draw.rect(surface, color, (cell_size + (col * cell_size + 1), cell_size + (row * cell_size + 1), cell_size - 2, cell_size - 2))
 
 def draw_borders(surface, constraints, grid_size, cell_size, font):
-	pygame.draw.rect(surface, (100,0,0), (cell_size, 0, grid_size * cell_size, cell_size))
-	pygame.draw.rect(surface, (100,0,0), (0, cell_size, cell_size, grid_size * cell_size))
-	for i in range(grid_size):
-		aux = ' '.join(str(x) for x in constraints[0][i])
-		font.render_to(surface, ((cell_size) * (i+1) +10, 5), aux, (255, 255, 255), None, 0, 0, cell_size//len(constraints[0][i]))
-		aux = ' '.join(str(x) for x in constraints[1][i])
-		font.render_to(surface, (10, (cell_size) * (i+1) +5), aux, (255, 255, 255), None, 0, 0, cell_size//len(constraints[1][i]))
+    pygame.draw.rect(surface, (100,0,0), (cell_size, 0, grid_size * cell_size, cell_size))
+    pygame.draw.rect(surface, (100,0,0), (0, cell_size, cell_size, grid_size * cell_size))
+    for i in range(grid_size):
+        aux = ' '.join(str(x) for x in constraints[0][i])
+        font.render_to(surface, ((cell_size) * (i+1) +10, 5), aux, (255, 255, 255), None, 0, 0, cell_size//len(constraints[0][i]))
+        aux = ' '.join(str(x) for x in constraints[1][i])        
+        font.render_to(surface, (10, (cell_size) * (i+1) +5), aux, (255, 255, 255), None, 0, 0, cell_size//len(constraints[1][i]))
           
 def handle_click(pos, board, cell_size):
     row = (pos[1] // cell_size) -1
@@ -36,7 +36,6 @@ window_size = grid_size * cell_size
 window = pygame.display.set_mode((window_size + cell_size, window_size + cell_size))
 clock = pygame.time.Clock()
 board = [[False for i in range(grid_size)] for i in range(grid_size)]
-
 solutionBoard = createBoard.createBoard(grid_size)
 constraints = Constraints.constraints(solutionBoard)
 
