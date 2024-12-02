@@ -1,5 +1,5 @@
 import pygame
-from NonoDefTest import game
+from NonoDef import game
 from BaseButton import Button
 
 button_size = (200, 70)
@@ -34,19 +34,19 @@ def menuBool(window, window_size, font, clock):
 
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if button_5.isOver(pos):
-                    game(window, window_size, font, clock, 5)
+                    game(window, window_size, font, clock, 5,5)
                     running = False
 
                 elif button_10.isOver(pos):
-                    game(window, window_size, font, clock, 10)
+                    game(window, window_size, font, clock, 10,10)
                     running = False
 
                 elif button_15.isOver(pos):
-                    game(window, window_size, font, clock, 15)
+                    game(window, window_size, font, clock, 15,15)
                     running = False
 
                 elif button_20.isOver(pos):
-                    game(window, window_size, font, clock, 20)
+                    game(window, window_size, font, clock, 20,20)
                     running = False
 
                 elif quit_button.isOver(pos):
