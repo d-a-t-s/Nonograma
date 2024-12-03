@@ -122,12 +122,12 @@ def game(window, window_size, font, clock, grid_size):
     solved = False
     dragging = False
     panel = pygame.Surface(window_size)
-    img = pygame.image.load('bg_nonogram.png')
+    img = pygame.image.load('bg_nonogram.png').convert()
     panel.blit(img, (0, 0))
     colored_board = [[0 for i in range(grid_size)] for i in range(grid_size)]
     board = [[False for i in range(grid_size)] for i in range(grid_size)]
 
-    solutionBoard = createBoard.createBoard(grid_size)
+    solutionBoard = createBoard.createBoard(grid_size, grid_size)
     constraints = Constraints.constraints(solutionBoard)
 
     nonogram = Nonogram(constraints[0],constraints[1])

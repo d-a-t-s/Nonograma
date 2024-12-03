@@ -1,7 +1,7 @@
 from parsefile import *
 
 def board_colored_nono():
-    palette, board_solved = Colored_grid('girasol_25x15.txt')
+    palette, board_solved = Colored_grid('2B_50x50.txt')
     col_constraint = []
     row_constraint = []
     

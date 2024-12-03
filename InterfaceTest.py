@@ -5,6 +5,8 @@ from BaseButton import Button
 
 def main_menu():
     clock = pygame.time.Clock()
+    pygame.mixer.music.play(-1, 0, 100)
+    pygame.mixer.music.set_volume(0.32)
 
     running = True
     while running:
@@ -14,7 +16,7 @@ def main_menu():
 
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if start_button.isOver(pos):
-                    menuBool(window, window_size, font, clock)
+                    menuBool(window, window_size, font, clock, img_menu)
                     window.blits(blit_sequence=((img_menu, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, (window_size[1] // 8) + 5)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, window_size[1] // 8))))
 
                 elif colored_button.isOver(pos):
@@ -64,10 +66,12 @@ window_size = (1152, 864)
 window = pygame.display.set_mode(window_size)
 pygame.display.set_caption("Interface test")
 
+pygame.mixer.music.load("PKM_B-W_Dragon_Spiral_Tower_Music.mp3")
+
 font = pygame.freetype.Font('upheavtt.ttf', 16)
 bg_text = font.render("PIXEL PASSION", BLACK, None, 0, 0, 110)
 fg_text = font.render("PIXEL PASSION", WHITE, None, 0, 0, 110)
-img_menu = pygame.image.load('bg_menu.png')
+img_menu = pygame.image.load('bg_menu.png').convert()
 window.blits(blit_sequence=((img_menu, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, (window_size[1] // 8) + 5)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, window_size[1] // 8))))
 
 button_size = (200, 60)

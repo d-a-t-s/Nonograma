@@ -7,14 +7,13 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 OVER = (225, 209, 65)
 
-def menuBool(window, window_size, font, clock):
+def menuBool(window, window_size, font, clock, img):
 
     panel = pygame.Surface((window_size[0], window_size[1]))
-    img_menu = pygame.image.load('bg_menu.png')
     fg_text = font.render("SELECT SIZE", WHITE, None, 0, 0, window_size[0]//14)
     bg_text = font.render("SELECT SIZE", BLACK, None, 0, 0, window_size[0]//14)
 
-    panel.blits(blit_sequence=((img_menu, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, 55)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, 50))))
+    panel.blits(blit_sequence=((img, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, 55)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, 50))))
 
 
     button_5 = Button(WHITE, (window_size[0]//2) - button_size[0]//2, (window_size[1]//2) - button_size[1]//2 - 170, button_size[0], button_size[1], "5 X 5")

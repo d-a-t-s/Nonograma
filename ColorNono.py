@@ -107,7 +107,7 @@ def game(window, window_size, font, clock):
     solved = False
     dragging = False
     panel = pygame.Surface(window_size)
-    img = pygame.image.load('bg_nonogram.png')
+    img = pygame.image.load('bg_nonogram.png').convert()
     panel.blit(img, (0, 0))
 
     palette, col_constraint, row_constraint, board_solved = board_colored_nono()

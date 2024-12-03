@@ -42,9 +42,9 @@ def leer_pixeles(imagen, f):
 
 
 if __name__ == "__main__":
-    ruta_imagen = 'girasol.jpeg' 
+    ruta_imagen = '2B.png' 
     num_colores = 8  # Número de colores
-    nueva_resolucion = (25, 15)  # Nueva resolución deseada (ancho, alto)
+    nueva_resolucion = (50, 50)  # Nueva resolución deseada (ancho, alto)
     point = ruta_imagen.index('.')
     ruta = ruta_imagen[:point]
     resolution = str(nueva_resolucion[0]) + 'x' + str(nueva_resolucion[1])
