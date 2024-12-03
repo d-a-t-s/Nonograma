@@ -1,16 +1,16 @@
 import random as rn
 
-def createBoard(num1, num2):
-    board = list(map(lambda x: list(map(lambda x: rn.choice([True, False]), range(num1))), range(num2)))
+def createBoard(n_cols, n_rows):
+    board = list(map(lambda x: list(map(lambda x: rn.choice([True, False]), range(n_cols))), range(n_rows)))
 
     #Ensure that each column has at least one True
-    for j in range(num1):
-        if not any(board[i][j] for i in range(num1)):
-            board[rn.randrange(0, num1)][j] = True
-    
+    for j in range(n_cols):
+        if not any(board[i][j] for i in range(n_rows)):
+            board[rn.randrange(0, n_rows)][j] = True
+
     #Ensure that each row has at least one True
-    for i in range(num2):
-        if not any(board[i][j] for j in range(num2)):
-            board[i][rn.randrange(0, num2)] = True
-    
+    for i in range(n_rows):
+        if not any(board[i][j] for j in range(n_cols)):
+            board[i][rn.randrange(0, n_cols)] = True
+
     return board

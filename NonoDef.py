@@ -27,14 +27,14 @@ class SurfaceVConstraintCell():
         self.cell.fill(self.color, (1 ,1 ,self.cell_size - 2, self.cell_size - 2))
         if character != None:
             self.character = character
-            self.cell.fill(self.color, (1 ,1 ,cell_size - 2, self.height - 2))
+            self.cell.fill(self.color, (1 ,1 ,self.cell_size - 2, self.height - 2))
             rect_character = self.font.get_rect("%s" % character,0,0,(self.height)-2)
             if rect_character.width >= self.height:
                 height = floor((desired_height / rect_character.width) * desired_height)
                 rect_character = self.font.get_rect(None, 0, 0, height)
-                font.render_to(self.cell, ((self.cell_size - rect_character.width) / 2, (self.height - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, height)
+                self.font.render_to(self.cell, ((self.cell_size - rect_character.width) / 2, (self.height - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, height)
             else:
-                font.render_to(self.cell, ((self.cell_size - rect_character.width) / 2, (self.height - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, desired_height)
+                self.font.render_to(self.cell, ((self.cell_size - rect_character.width) / 2, (self.height - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, desired_height)
 
 class SurfaceVConstraint():
 
@@ -42,12 +42,11 @@ class SurfaceVConstraint():
         self.cell_size = cell_size
         self.n_cols = n_cols
         self.n_rows = max_constraints_cols
-        self.zoom = zoom
         self.height = self.cell_size if cell_size <= 50 else 50
 
         self.cell_matrix = [[0 for i in range(n_cols)] for i in range(self.n_rows)]
         self.surface = pygame.Surface((cell_size * n_cols, self.height * self.n_rows), pygame.SRCALPHA)
-        self.surface.fill((0,0,20,50))
+        #self.surface.fill((0,0,20,50))
 
         for x in range(self.n_cols):
             aux = len(v_constraints[x])
@@ -83,9 +82,9 @@ class SurfaceHConstraintCell():
             if rect_character.width >= self.width:
                 height = floor((desired_height / rect_character.width) * desired_height)
                 rect_character = self.font.get_rect(None, 0, 0, height)
-                font.render_to(self.cell, ((self.width - rect_character.width) / 2, (self.cell_size - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, height)
+                self.font.render_to(self.cell, ((self.width - rect_character.width) / 2, (self.cell_size - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, height)
             else:
-                font.render_to(self.cell, ((self.width - rect_character.width) / 2, (self.cell_size - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, desired_height)
+                self.font.render_to(self.cell, ((self.width - rect_character.width) / 2, (self.cell_size - rect_character.height) / 2), None, (255, 255, 255), None, 0, 0, desired_height)
 
 class SurfaceHConstraint():
 
@@ -93,12 +92,11 @@ class SurfaceHConstraint():
         self.cell_size = cell_size
         self.n_cols = max_constraints_rows
         self.n_rows = n_rows
-        self.zoom = zoom
         self.width = self.cell_size if cell_size <= 50 else 50
 
         self.cell_matrix = [[0 for i in range(self.n_cols)] for i in range(self.n_rows)]
         self.surface = pygame.Surface((self.width * self.n_cols, self.cell_size * self.n_rows), pygame.SRCALPHA) # * 2
-        self.surface.fill((0,0,20,50))
+        #self.surface.fill((0,0,20,50))
 
         for y in range(self.n_rows):
             aux = len(h_constraints[y])
@@ -113,7 +111,9 @@ class SurfaceHConstraint():
 
 class SurfaceGridCell():
 
-    def __init__(self,surface_grid, cell_size, x, y, font):
+    def __init__(self, surface_grid, states_board, states, cell_size, x, y, font):
+        self.states_board = states_board
+        self.states = states
         self.cell_size = cell_size
         self.font = font
         self.cell = None
@@ -126,7 +126,7 @@ class SurfaceGridCell():
         self.update()
 
     def update(self):
-        self.color, self.character = states[states_board[self.y][self.x]]
+        self.color, self.character = self.states[self.states_board[self.y][self.x]]
         self.cell.fill(self.color, (1 ,1 ,self.cell_size - 2, self.cell_size - 2))
         desired_height = self.height - 2
         if self.character != None:
@@ -135,17 +135,16 @@ class SurfaceGridCell():
             if rect_character.width >= rect_character.height:
                 height = (desired_height / rect_character.width) * desired_height
                 rect_character = self.font.get_rect(None, 0, 0, height)
-                font.render_to(self.cell, ((self.cell.get_width() - rect_character.width + 1) / 2, (self.height - rect_character.height + 1) / 2), None, (255, 0, 0), None, 0, 0, height)
+                self.font.render_to(self.cell, ((self.cell.get_width() - rect_character.width + 1) / 2, (self.height - rect_character.height + 1) / 2), None, (255, 0, 0), None, 0, 0, height)
             else:
-                font.render_to(self.cell, ((self.cell.get_width() - rect_character.width + 1) / 2, (self.height - rect_character.height + 1) / 2), None, (255, 0, 0), None, 0, 0, self.cell.get_width())
+                self.font.render_to(self.cell, ((self.cell.get_width() - rect_character.width + 1) / 2, (self.height - rect_character.height + 1) / 2), None, (255, 0, 0), None, 0, 0, self.cell.get_width())
 
 class SurfaceGrid():
 
-    def __init__(self, states, states_board, cell_size, n_cols, n_rows, font):
+    def __init__(self, states_board, states ,cell_size, n_cols, n_rows, font):
         self.cell_size = cell_size
         self.n_cols = n_cols
         self.n_rows = n_rows
-        self.zoom = zoom
         self.states_board = states_board
         self.states = states
 
@@ -155,7 +154,7 @@ class SurfaceGrid():
 
         for x in range(n_cols):
             for y in range(n_rows):
-                cell = SurfaceGridCell(self.surface, cell_size, x, y, font)
+                cell = SurfaceGridCell(self.surface, self.states_board, self.states, cell_size, x, y, font)
                 self.cell_matrix[y][x] = cell
 
     def update(self, col, row):
@@ -164,7 +163,7 @@ class SurfaceGrid():
     def get_surface(self):
         return self.surface
 
-def handle_click(pos, type, board, n_cols, n_rows, cell_size, offset_x, offset_y, surface_grid):
+def handle_click(pos, type, states_board, board, n_cols, n_rows, cell_size, offset_x, offset_y, surface_grid):
     row = (floor((pos[1] - offset_y) / (cell_size)))
     col = (floor((pos[0] - offset_x) / (cell_size)))
 
@@ -198,16 +197,11 @@ def check(board, solution_board):
     return True
 
 
-if __name__ == "__main__":
+def game(window, window_size, font, clock, n_cols, n_rows):
     pygame.init()
     window_size = (1152, 864)
 
-    cell_size = 15
-    n_cols = 50
-    n_rows = 50
-    max_constraints_cols = 3
-    max_constraints_rows = 4
-
+    cell_size = 50
 
     zoom = 1
     zoom_min = 0.1
@@ -226,18 +220,18 @@ if __name__ == "__main__":
     solutionBoard = createBoard.createBoard(n_cols, n_rows)
     constraints_cols, constraints_rows = Constraints.constraints(solutionBoard)
 
-    # nonogram = Nonogram(constraints_cols, constraints_rows)
-    # while not nonogram.solve():
-    #     solutionBoard = createBoard.createBoard(n_cols, n_rows)
-    #     constraints_cols, constraints_rows = Constraints.constraints(solutionBoard)
-    #     nonogram = Nonogram(constraints_cols, constraints_rows)
+    nonogram = Nonogram(constraints_cols, constraints_rows)
+    while not nonogram.solve():
+        solutionBoard = createBoard.createBoard(n_cols, n_rows)
+        constraints_cols, constraints_rows = Constraints.constraints(solutionBoard)
+        nonogram = Nonogram(constraints_cols, constraints_rows)
 
     max_constraints_cols = max_number_contraints(constraints_cols)
     max_constraints_rows = max_number_contraints(constraints_rows)
 
     ###
-
-    surface_grid = SurfaceGrid(states, states_board, cell_size, n_cols, n_rows, font)
+    
+    surface_grid = SurfaceGrid(states_board, states, cell_size, n_cols, n_rows, font)
     grid_render = surface_grid.get_surface()
 
     v_constraints = SurfaceVConstraint(cell_size, n_cols, max_constraints_cols, constraints_cols, font)
@@ -249,29 +243,23 @@ if __name__ == "__main__":
 
     offset_x = max(cell_size * max_constraints_rows, (window_size[0] - cell_size * n_cols) // 2)
     offset_y = max(cell_size * max_constraints_cols, (window_size[1] - cell_size * n_rows) // 2)
-    dragging = False
-    
 
-    #elimitane 
-    window = pygame.display.set_mode(window_size)
-    pygame.display.set_caption("Pixel Passion")
+    check_panel = pygame.Surface((window_size[0] // 4, window_size[1] // 16), pygame.SRCALPHA)
+    text_wrong = font.render("There is something wrong...", (255, 255 ,255), None, 0, 0, 20)
+    text_correct = font.render("Everything is fine!!", (255, 255 ,255), None, 0 ,0, 20)
+    dragging = False
 
     
     img = pygame.image.load('bg_nonogram.png').convert()
 
     clock = pygame.time.Clock()
 
-    #elimitane 
-    #print(solutionBoard)
-
     running = True
     refresh = True
+    solved = False
 
     while running:
         clock.tick(60)
-
-        if board == solutionBoard:
-            win(window, window_size, font, clock)
 
         for event in pygame.event.get():
             pos = pygame.mouse.get_pos()
@@ -287,7 +275,7 @@ if __name__ == "__main__":
                     last_mouse_pos = event.pos
                 elif event.button == 3:
                     refresh = True
-                    handle_click(event.pos, 3, board, n_cols, n_rows, cell_size * zoom, offset_x, offset_y, surface_grid)#3 para boton derecho cambiar por algo legible
+                    handle_click(event.pos, 3, states_board, board, n_cols, n_rows, cell_size * zoom, offset_x, offset_y, surface_grid)#3 para boton derecho cambiar por algo legible
 
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
@@ -300,7 +288,16 @@ if __name__ == "__main__":
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     refresh = True
-                    handle_click(event.pos, 1, board, n_cols, n_rows, cell_size * zoom, offset_x, offset_y, surface_grid)
+                    handle_click(event.pos, 1, states_board, board, n_cols, n_rows, cell_size * zoom, offset_x, offset_y, surface_grid)
+                    if board == solutionBoard:
+                        solved = True
+                        quited = win(window, window_size, font, clock)
+                    else:
+                        solved = False
+                        quited = False
+                    if quited:
+                        running = False
+
                 elif event.button == 2:  # Boton central
                     dragging = False
             
@@ -320,15 +317,41 @@ if __name__ == "__main__":
                 del surface_grid
                 del grid_render
 
-                surface_grid = SurfaceGrid(states, states_board, cell_size * zoom, n_cols, n_rows, font)
+                surface_grid = SurfaceGrid(states_board, states, cell_size * zoom, n_cols, n_rows, font)
                 grid_render = surface_grid.get_surface()
                 v_constraints = SurfaceVConstraint(cell_size * zoom, n_cols, max_constraints_cols, constraints_cols, font)
                 surface_v_constraints = v_constraints.get_surface()
-                h_constraints = SurfaceHConstraint(cell_size * zoom, max_constraints_rows, n_cols, constraints_rows, font)
+                h_constraints = SurfaceHConstraint(cell_size * zoom, max_constraints_rows, n_rows, constraints_rows, font)
                 surface_h_constraints = h_constraints.get_surface()
+            
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_ESCAPE:
+                    refresh = True
+                    if solved:
+                        quited = win(window, window_size, font, clock)
+                    else:
+                        quited = menuEsc(window, window_size[0], window_size[1], font, clock)
+
+                    if quited:
+                        running = False
+                elif event.key == pygame.K_SPACE:
+                    window.blit(img, (0, 0))
 
             elif event.type == pygame.QUIT:
                 running = False
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    if not check(board, solutionBoard):
+                        check_panel.fill((0, 0, 0, 0))
+                        check_panel.blit(text_wrong[0], ((check_panel.get_width() // 2) - text_wrong[1].width // 2, check_panel.get_height() // 2 - text_wrong[1].height // 2))
+                        pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
+                        window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
+                    else:
+                        check_panel.fill((0, 0, 0, 0))
+                        check_panel.blit(text_correct[0], ((check_panel.get_width() // 2) - text_correct[1].width // 2, check_panel.get_height() // 2 - text_correct[1].height // 2))
+                        pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
+                        window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
 
         if refresh == True:
             refresh = False
@@ -336,8 +359,9 @@ if __name__ == "__main__":
             window.blit(grid_render, (offset_x, offset_y))
             window.blit(img, (min(cell_size * zoom, 50) * max_constraints_rows, 0), ((min(cell_size * zoom, 50) * max_constraints_rows, 0),(window_size[0], min(cell_size * zoom, 50) * max_constraints_cols)))
             window.blit(img, (0, min(cell_size * zoom, 50) * max_constraints_cols), ((0, min(cell_size * zoom, 50) * max_constraints_cols),((min(cell_size * zoom, 50) * max_constraints_rows), window_size[1])))
-            window.blit(surface_v_constraints, (offset_x, offset_y - min(cell_size * zoom, 50) * max_constraints_cols))
-            window.blit(surface_h_constraints, ((offset_x - min(cell_size * zoom, 50) * max_constraints_rows), offset_y))
+            window.blit(surface_v_constraints, (offset_x, max(0, offset_y - min(cell_size * zoom, 50) * max_constraints_cols)))
+            window.blit(surface_h_constraints, (max(0, offset_x - min(cell_size * zoom, 50) * max_constraints_rows), offset_y))
             window.blit(img,(0,0),((0,0),(max(offset_x,min(cell_size * zoom, 50) * max_constraints_rows), max(offset_y,min(cell_size * zoom, 50) * max_constraints_cols))))
+            
             pygame.display.flip()
         
