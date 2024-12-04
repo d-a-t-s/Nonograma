@@ -64,8 +64,8 @@ def game(window, window_size, font, clock, solutionBoard = None, states_board = 
             return
 
         ruta_imagen = user_image
-        num_colores = 4   # Número de colores
-        nueva_resolucion = (20, 10)  # Nueva resolución deseada (ancho, alto)
+        num_colores = 6   # Número de colores
+        nueva_resolucion = (50, 50)  # Nueva resolución deseada (ancho, alto)
         point = ruta_imagen.index('.')
         ruta = ruta_imagen[:point]
         resolution = str(nueva_resolucion[0]) + 'x' + str(nueva_resolucion[1])
@@ -121,16 +121,27 @@ def game(window, window_size, font, clock, solutionBoard = None, states_board = 
     max_constraints_cols = max_number_contraints(constraints_cols)
     max_constraints_rows = max_number_contraints(constraints_rows)
 
-    offset_x = max(cell_size * max_constraints_rows, (window_size[0] - cell_size * n_cols) // 2)
-    offset_y = max(cell_size * max_constraints_cols, (window_size[1] - cell_size * n_rows) // 2)
+    temp_zoom = window_size[0] / ((n_cols + max_constraints_rows) * cell_size)
+    if (temp_zoom < zoom):
+        zoom = temp_zoom
 
-    surface_grid = SurfaceGrid(states_board, states, cell_size, n_cols, n_rows, font)
+    temp_zoom = window_size[1] / ((n_rows + max_constraints_rows) * cell_size)
+    if (temp_zoom < zoom):
+        zoom = temp_zoom
+
+    if (zoom < zoom_min):
+        zoom = zoom_min
+
+    offset_x = max(cell_size * max_constraints_rows * zoom, (window_size[0] - cell_size * n_cols) * zoom // 2)
+    offset_y = max(cell_size * max_constraints_cols * zoom, (window_size[1] - cell_size * n_rows) * zoom // 2)
+
+    surface_grid = SurfaceGrid(states_board, states, cell_size * zoom, n_cols, n_rows, font)
     grid_render = surface_grid.get_surface()
 
-    v_constraints = SurfaceVConstraint(cell_size, n_cols, max_constraints_cols, constraints_cols, font, states)
+    v_constraints = SurfaceVConstraint(cell_size * zoom, n_cols, max_constraints_cols, constraints_cols, font, states)
     surface_v_constraints = v_constraints.get_surface()
 
-    h_constraints = SurfaceHConstraint(cell_size, max_constraints_rows, n_rows, constraints_rows, font, states)
+    h_constraints = SurfaceHConstraint(cell_size * zoom, max_constraints_rows, n_rows, constraints_rows, font, states)
     surface_h_constraints = h_constraints.get_surface()
 
     check_panel = pygame.Surface((window_size[0] // 4, window_size[1] // 16), pygame.SRCALPHA)

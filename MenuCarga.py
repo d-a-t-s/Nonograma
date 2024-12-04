@@ -33,12 +33,12 @@ def menuCarga(window, window_size, font, clock, img):
     for i in range(len(puzzles)):
 
         if i % 6 <= 2:
-            button = Button(WHITE, (window_size[0]//2 - window_size[0]//10) + window_size[0]//4 * (i % 3 - 1), window_size[1]//3 - window_size[1]//8, window_size[0]//5, window_size[0]//5, f"{len(puzzles[i][0])} x {len(puzzles[i][0][0])}")
+            button = Button(WHITE, (window_size[0]//2 - window_size[0]//10) + window_size[0]//4 * (i % 3 - 1), window_size[1]//3 - window_size[1]//8, window_size[0]//5, window_size[0]//5, f"{len(puzzles[i][0][0])} x {len(puzzles[i][0])}")
             button_list.append(button)
             loaded_puzzles += 1
 
         else: 
-            button = Button(WHITE, (window_size[0]//2 - window_size[0]//10) + window_size[0]//4 * (i % 3 - 1), window_size[1]//3 + window_size[1]//5, window_size[0]//5, window_size[0]//5, f"{len(puzzles[i][0])} x {len(puzzles[i][0][0])}")
+            button = Button(WHITE, (window_size[0]//2 - window_size[0]//10) + window_size[0]//4 * (i % 3 - 1), window_size[1]//3 + window_size[1]//5, window_size[0]//5, window_size[0]//5, f"{len(puzzles[i][0][0])} x {len(puzzles[i][0])}")
             button_list.append(button)
             loaded_puzzles += 1
 
