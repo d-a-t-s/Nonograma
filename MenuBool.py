@@ -1,21 +1,24 @@
 import pygame
 from NonoDef import game
 from BaseButton import Button
+from MusicSlider import Slider
 
 button_size = (200, 70)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 OVER = (225, 209, 65)
+DARKBLUE = (10, 0, 255)
 
-def menuBool(window, window_size, font, clock):
+def menuBool(window, window_size, font, clock, img):
 
     panel = pygame.Surface((window_size[0], window_size[1]))
-    img_menu = pygame.image.load('bg_menu.png')
     fg_text = font.render("SELECT SIZE", WHITE, None, 0, 0, window_size[0]//14)
     bg_text = font.render("SELECT SIZE", BLACK, None, 0, 0, window_size[0]//14)
 
-    panel.blits(blit_sequence=((img_menu, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, 55)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, 50))))
+    panel.blits(blit_sequence=((img, (0, 0)), (bg_text[0], ((window_size[0] - bg_text[1].width) // 2, 55)), (fg_text[0], ((window_size[0] - fg_text[1].width) // 2, 50))))
 
+    volume_slider = Slider(DARKBLUE, WHITE, 70, 30, 150, 20, 0, 1, pygame.mixer.music.get_volume())
+    sub_img = img.subsurface((60, 30, 170, 20))
 
     button_5 = Button(WHITE, (window_size[0]//2) - button_size[0]//2, (window_size[1]//2) - button_size[1]//2 - 170, button_size[0], button_size[1], "5 X 5")
     button_10 = Button(WHITE, (window_size[0]//2) - button_size[0]//2, (window_size[1]//2) - button_size[1]//2 - 70, button_size[0], button_size[1], "10 X 10")
@@ -46,7 +49,7 @@ def menuBool(window, window_size, font, clock):
                     running = False
 
                 elif button_20.isOver(pos):
-                    game(window, window_size, font, clock, 20,20)
+                    game(window, window_size, font, clock, 120,120)
                     running = False
 
                 elif quit_button.isOver(pos):
@@ -75,6 +78,11 @@ def menuBool(window, window_size, font, clock):
                     button_20.color = WHITE
                     quit_button.color = WHITE
 
+            volume_slider.handle_event(event)
+            panel.blit(sub_img, (60, 30))
+
+        volume_slider.val = pygame.mixer.music.get_volume()
+        volume_slider.draw(panel)
         button_5.draw(panel, True)
         button_10.draw(panel, True)
         button_15.draw(panel, True)
