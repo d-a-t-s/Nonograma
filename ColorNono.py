@@ -132,8 +132,8 @@ def game(window, window_size, font, clock, solutionBoard = None, states_board = 
     if (zoom < zoom_min):
         zoom = zoom_min
 
-    offset_x = max(cell_size * max_constraints_rows * zoom, (window_size[0] - cell_size * n_cols) * zoom // 2)
-    offset_y = max(cell_size * max_constraints_cols * zoom, (window_size[1] - cell_size * n_rows) * zoom // 2)
+    offset_x = max(cell_size * max_constraints_rows * zoom, (window_size[0] - cell_size * n_cols * zoom) // 2)
+    offset_y = max(cell_size * max_constraints_cols * zoom, (window_size[1] - cell_size * n_rows * zoom) // 2)
 
     surface_grid = SurfaceGrid(states_board, states, cell_size * zoom, n_cols, n_rows, font)
     grid_render = surface_grid.get_surface()
