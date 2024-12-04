@@ -56,7 +56,7 @@ def menuCarga(window, window_size, font, clock, img):
                 for i in range(6 * page, min(6 * (page + 1), len(puzzles))):
                     if button_list[i].isOver(pos):
                         if puzzles[i][2][2][1] == "x":
-                            b_w_game(window, window_size, font, clock, len(puzzles[i][0]), len(puzzles[i][0][0]), puzzles[i][0], puzzles[i][1], puzzles[i][2])
+                            b_w_game(window, window_size, font, clock, len(puzzles[i][0][0]), len(puzzles[i][0]), puzzles[i][0], puzzles[i][1], puzzles[i][2])
 
                         else:
                             c_game(window, window_size, font, clock, puzzles[i][0], puzzles[i][1], puzzles[i][2])

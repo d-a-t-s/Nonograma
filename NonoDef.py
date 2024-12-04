@@ -69,19 +69,27 @@ def game(window, window_size, font, clock, n_cols, n_rows, solutionBoard = None,
 
     max_constraints_cols = max_number_contraints(constraints_cols)
     max_constraints_rows = max_number_contraints(constraints_rows)
+
+    temp_zoom = window_size[0] / ((n_cols + max_constraints_rows) * cell_size)
+    if (temp_zoom < zoom):
+        zoom = temp_zoom
+    temp_zoom = window_size[1] / ((n_rows + max_constraints_rows) * cell_size)
+    if (temp_zoom < zoom):
+        zoom = temp_zoom
+    if (zoom < zoom_min):
+        zoom = zoom_min
+
+    offset_x = max(cell_size * max_constraints_rows * zoom, (window_size[0] - cell_size * n_cols * zoom) // 2)
+    offset_y = max(cell_size * max_constraints_cols * zoom, (window_size[1] - cell_size * n_rows * zoom) // 2)
     
-    surface_grid = SurfaceGrid(states_board, states, cell_size, n_cols, n_rows, font)
+    surface_grid = SurfaceGrid(states_board, states, cell_size * zoom, n_cols, n_rows, font)
     grid_render = surface_grid.get_surface()
 
-    v_constraints = SurfaceVConstraint(cell_size, n_cols, max_constraints_cols, constraints_cols, font)
+    v_constraints = SurfaceVConstraint(cell_size * zoom, n_cols, max_constraints_cols, constraints_cols, font)
     surface_v_constraints = v_constraints.get_surface()
 
-    h_constraints = SurfaceHConstraint(cell_size, max_constraints_rows, n_rows, constraints_rows, font)
+    h_constraints = SurfaceHConstraint(cell_size * zoom, max_constraints_rows, n_rows, constraints_rows, font)
     surface_h_constraints = h_constraints.get_surface()
-
-
-    offset_x = max(cell_size * max_constraints_rows, (window_size[0] - cell_size * n_cols) // 2)
-    offset_y = max(cell_size * max_constraints_cols, (window_size[1] - cell_size * n_rows) // 2)
 
     check_panel = pygame.Surface((window_size[0] // 4, window_size[1] // 16), pygame.SRCALPHA)
     text_wrong = font.render("There is something wrong...", (255, 255 ,255), None, 0, 0, 20)
@@ -141,7 +149,8 @@ def game(window, window_size, font, clock, n_cols, n_rows, solutionBoard = None,
                 elif event.button == 2:  # Boton central
                     dragging = False
             
-            elif event.type == pygame.MOUSEWHEEL: #button 4 y 5 son el scroll
+            elif event.type == pygame.MOUSEWHEEL: # Button 4 y 5 son el scroll
+                refresh = True
                 mouse_x, mouse_y = pygame.mouse.get_pos()
 
                 if event.y > 0:

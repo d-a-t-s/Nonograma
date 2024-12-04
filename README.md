@@ -23,11 +23,14 @@ Pasos para instalar y ejecutar el proyecto:
 
 4. Ejecutar el proyecto:
     ```sh
-    python InterfaceTest.py
+    python main.py
     ```
 
-## Teclas utiles
+## Instrucciones de uso
 
-ESC: Usada para abrir un menu de pausa al resolver un puzzle
-SPACE: Usada para obtener pistas mientras se resulve un puzzle
-
+Botón Izquierdo: Marcar casillas.  
+Botón Derecho: En puzzles B/N marca una X.  
+Botón Central: Arrastrar el tablero.  
+Botón Central (Scroll): Aumenta o disminuye el zoom.  
+ESC: Usada para abrir un menu de pausa al resolver un puzzle.  
+SPACE: Usada para obtener pistas mientras se resulve un puzzle.  

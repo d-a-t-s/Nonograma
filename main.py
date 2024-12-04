@@ -8,7 +8,7 @@ from MenuCarga import menuCarga
 def main_menu():
     clock = pygame.time.Clock()
     pygame.mixer.music.play(-1, 0, 100)
-    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.set_volume(0.2)
     volume_slider = Slider(DARKBLUE, WHITE, 70, 30, 150, 20, 0, 1, pygame.mixer.music.get_volume())
 
     running = True
