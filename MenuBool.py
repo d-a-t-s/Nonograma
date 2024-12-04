@@ -49,7 +49,7 @@ def menuBool(window, window_size, font, clock, img):
                     running = False
 
                 elif button_20.isOver(pos):
-                    game(window, window_size, font, clock, 120,120)
+                    game(window, window_size, font, clock, 20,20)
                     running = False
 
                 elif quit_button.isOver(pos):

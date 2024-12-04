@@ -7,6 +7,7 @@ from MenuEsc import menuEsc
 from MenuWin import win
 from math import *
 from BaseButton import Button
+from Guardar import guardar_matriz
 
 from ColorNonoBoard import *
 from NonogramSolver import *
@@ -30,7 +31,7 @@ def max_number_contraints(constraints):
 def check(board_solved, states_board, n_color):
     for i in range(len(board_solved)):
         for j in range(len(board_solved[0])):
-            if ((board_solved[i][j] != states_board[i][j]) or (states_board[i][j] != (n_color - 1))):
+            if ((board_solved[i][j] != states_board[i][j]) and (states_board[i][j] != (n_color - 1))):
                 return False
     return True
 
@@ -42,49 +43,80 @@ def color_selection(window_size, states):
 
     return buttons
 
-def game(window, window_size, font, clock):
+def game(window, window_size, font, clock, solutionBoard = None, states_board = None, states_loaded = None):
     cell_size = 50
     zoom = 1
     zoom_min = 0.1
     zoom_max = 3
     zoom_step = 0.03
     selected_color = 2
-    board_solved = []
-    states = []
+    board_solved = solutionBoard
+    states = states_loaded
+    constraints_cols = []
+    constraints_rows = []
 
     solved = False
     dragging = False
-    panel = pygame.Surface(window_size)
-    img = pygame.image.load('bg_nonogram.png')
-    panel.blit(img, (0, 0))
+
+    if solutionBoard == None and states_board == None and states_loaded == None:
+        user_image = tkinter.filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
+        if not user_image:
+            return
+
+        ruta_imagen = user_image
+        num_colores = 4   # Número de colores
+        nueva_resolucion = (20, 10)  # Nueva resolución deseada (ancho, alto)
+        point = ruta_imagen.index('.')
+        ruta = ruta_imagen[:point]
+        resolution = str(nueva_resolucion[0]) + 'x' + str(nueva_resolucion[1])
+        txt = ruta + '_' + resolution
+        imagen_simplificada = Image2.simplificar_colores(ruta_imagen, num_colores, nueva_resolucion)
+
+        states, board_solved = Image2.leer_pixeles(imagen_simplificada)
+        states.append((255,255,255))
 
 
-    user_image = tkinter.filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
-
-    ruta_imagen = user_image
-    num_colores = 4   # Número de colores
-    nueva_resolucion = (4, 4)  # Nueva resolución deseada (ancho, alto)
-    point = ruta_imagen.index('.')
-    ruta = ruta_imagen[:point]
-    resolution = str(nueva_resolucion[0]) + 'x' + str(nueva_resolucion[1])
-    txt = ruta + '_' + resolution
-    imagen_simplificada = Image2.simplificar_colores(ruta_imagen, num_colores, nueva_resolucion)
-
-    f = open(f'{txt}.txt', "w")
-    Image2.leer_pixeles(imagen_simplificada, f)
-    f.close()
-
-
-    states, constraints_cols, constraints_rows, board_solved = board_colored_nono(f'{txt}.txt')
+    for i in range(len(board_solved)):
+            tempList = []
+            aux = None
+            counter = 0
+            for j in range(len(board_solved[0])):
+                if board_solved[i][j] == aux:
+                    counter += 1
+                elif aux == None:
+                    counter += 1
+                    aux = board_solved[i][j]
+                else:
+                    tempList.append((counter, aux))
+                    aux = board_solved[i][j]
+                    counter = 1
+                    continue
+            tempList.append((counter, aux))
+            constraints_rows.append(tempList)
+    for j in range(len(board_solved[0])):
+            tempList = []
+            aux = None
+            counter = 0
+            for i in range(len(board_solved)):
+                if board_solved[i][j] == aux:
+                    counter += 1
+                elif aux == None:
+                    counter += 1
+                    aux = board_solved[i][j]
+                else:
+                    tempList.append((counter, aux))
+                    aux = board_solved[i][j]
+                    counter = 1
+                    continue
+            tempList.append((counter, aux))
+            constraints_cols.append(tempList)
 
     n_cols = len(constraints_cols)
     n_rows = len(constraints_rows)
-    states.append((255,255,255))
-    states_board = [[len(states) - 1 for i in range(n_cols)] for i in range(n_rows)]
+    if states_board == None:
+        states_board = [[len(states) - 1 for i in range(n_cols)] for i in range(n_rows)]
 
     buttons = color_selection(window_size, states)
-    #panel_buttons = pygame.Surface((window_size[0], window_size[1] // 8))
-    #window.blit(panel, (0, window_size[1] - window_size[1] // 8))
 
     max_constraints_cols = max_number_contraints(constraints_cols)
     max_constraints_rows = max_number_contraints(constraints_rows)
@@ -110,7 +142,10 @@ def game(window, window_size, font, clock):
 
     running = True
     refresh = True
+    checked = False
     solved = False
+    quited = False
+    list = [False, False]
 
     while running:
         clock.tick(60)
@@ -138,7 +173,6 @@ def game(window, window_size, font, clock):
                     offset_x += mouse_x - last_mouse_pos[0]
                     offset_y += mouse_y - last_mouse_pos[1]
                     last_mouse_pos = event.pos
-                    panel.blit(img, (0, 0))
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1 and not solved:
@@ -156,7 +190,7 @@ def game(window, window_size, font, clock):
                 if event.button == 2:  # Boton central
                     dragging = False
 
-            elif event.type == pygame.MOUSEWHEEL: #al parecer button 4 y 5 son el scroll !!!cambiar importante crash inminente
+            elif event.type == pygame.MOUSEWHEEL: #button 4 y 5 son el scroll
                 refresh = True
                 mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -185,26 +219,23 @@ def game(window, window_size, font, clock):
                     if solved:
                         quited = win(window, window_size, font, clock)
                     else:
-                        quited = menuEsc(window, window_size[0], window_size[1], font, clock)
+                        list = menuEsc(window, window_size[0], window_size[1], font, clock)
 
-                    if quited:
+                    if quited or list[0]:
                         running = False
+                        
                 elif event.key == pygame.K_SPACE:
-                    panel.blit(img, (0, 0))
+                    checked = False
+                    refresh = True
                     
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if not check(board_solved, states_board, len(states)):
-                        check_panel.fill((0, 0, 0, 0))
-                        check_panel.blit(text_wrong[0], ((check_panel.get_width() // 2) - text_wrong[1].width // 2, check_panel.get_height() // 2 - text_wrong[1].height // 2))
-                        pygame.draw.rect(panel, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
-                        window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
-                    else:
-                        check_panel.fill((0, 0, 0, 0))
-                        check_panel.blit(text_correct[0], ((check_panel.get_width() // 2) - text_correct[1].width // 2, check_panel.get_height() // 2 - text_correct[1].height // 2))
-                        pygame.draw.rect(panel, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
-                        window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
+                    checked = True
+                    refresh = True
 
+        if list[1]:
+            guardar_matriz(board_solved, states_board, states)
+            list[1] = False
                     
         if refresh == True:
             refresh = False
@@ -225,4 +256,17 @@ def game(window, window_size, font, clock):
             
             for i in buttons:
                 i.draw(window, True)
+
+            if checked:
+                if not check(board_solved, states_board, len(states)):
+                    check_panel.fill((0, 0, 0, 0))
+                    check_panel.blit(text_wrong[0], ((check_panel.get_width() // 2) - text_wrong[1].width // 2, check_panel.get_height() // 2 - text_wrong[1].height // 2))
+                    pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
+                    window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
+                else:
+                    check_panel.fill((0, 0, 0, 0))
+                    check_panel.blit(text_correct[0], ((check_panel.get_width() // 2) - text_correct[1].width // 2, check_panel.get_height() // 2 - text_correct[1].height // 2))
+                    pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
+                    window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
+
             pygame.display.flip()
