@@ -4,6 +4,7 @@ import createBoard
 import Constraints
 from MenuEsc import menuEsc
 from MenuWin import win
+from Guardar import guardar_matriz
 
 from NonogramSolver import *
 from SurfaceNonogram import *
@@ -42,33 +43,32 @@ def check(board, solution_board):
     return True
 
 
-def game(window, window_size, font, clock, n_cols, n_rows):
+def game(window, window_size, font, clock, n_cols, n_rows, solutionBoard = None, states_board = None, states = None):
     cell_size = 50
     zoom = 1
     zoom_min = 0.1
     zoom_max = 3
     zoom_step = 0.03
 
-    states = [((255,255,255),None),((0,0,0),(None)),((255,255,255),("x"))]
-
-    states_board = [[0 for i in range(n_cols)] for i in range(n_rows)]
     board = [[False for i in range(n_cols)] for i in range(n_rows)]
 
-    ###
-
-    solutionBoard = createBoard.createBoard(n_cols, n_rows)
-    constraints_cols, constraints_rows = Constraints.constraints(solutionBoard)
-
-    nonogram = Nonogram(constraints_cols, constraints_rows)
-    while not nonogram.solve():
+    if solutionBoard == None and states_board == None and states == None:
+        states = [((255,255,255),None),((0,0,0),(None)),((255,255,255),("x"))]
+        states_board = [[0 for i in range(n_cols)] for i in range(n_rows)]
         solutionBoard = createBoard.createBoard(n_cols, n_rows)
+
         constraints_cols, constraints_rows = Constraints.constraints(solutionBoard)
         nonogram = Nonogram(constraints_cols, constraints_rows)
+        while not nonogram.solve():
+            solutionBoard = createBoard.createBoard(n_cols, n_rows)
+            constraints_cols, constraints_rows = Constraints.constraints(solutionBoard)
+            nonogram = Nonogram(constraints_cols, constraints_rows)
+
+    else:
+        constraints_cols, constraints_rows = Constraints.constraints(solutionBoard)
 
     max_constraints_cols = max_number_contraints(constraints_cols)
     max_constraints_rows = max_number_contraints(constraints_rows)
-
-    ###
     
     surface_grid = SurfaceGrid(states_board, states, cell_size, n_cols, n_rows, font)
     grid_render = surface_grid.get_surface()
@@ -93,7 +93,10 @@ def game(window, window_size, font, clock, n_cols, n_rows):
 
     running = True
     refresh = True
+    checked = False
     solved = False
+    quited = False
+    list = [False, False]
 
     while running:
         clock.tick(60)
@@ -138,8 +141,7 @@ def game(window, window_size, font, clock, n_cols, n_rows):
                 elif event.button == 2:  # Boton central
                     dragging = False
             
-            elif event.type == pygame.MOUSEWHEEL: #al parecer button 4 y 5 son el scroll !!!cambiar importante crash inminente
-                refresh = True
+            elif event.type == pygame.MOUSEWHEEL: #button 4 y 5 son el scroll
                 mouse_x, mouse_y = pygame.mouse.get_pos()
 
                 if event.y > 0:
@@ -167,26 +169,24 @@ def game(window, window_size, font, clock, n_cols, n_rows):
                     if solved:
                         quited = win(window, window_size, font, clock)
                     else:
-                        quited = menuEsc(window, window_size[0], window_size[1], font, clock)
+                        list = menuEsc(window, window_size[0], window_size[1], font, clock)
 
-                    if quited:
+                    if quited or list[0]:
                         running = False
+                        
                 elif event.key == pygame.K_SPACE:
-                    window.blit(img, (0, 0))
+                    checked = False
+                    refresh = True
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if not check(board, solutionBoard):
-                        check_panel.fill((0, 0, 0, 0))
-                        check_panel.blit(text_wrong[0], ((check_panel.get_width() // 2) - text_wrong[1].width // 2, check_panel.get_height() // 2 - text_wrong[1].height // 2))
-                        pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
-                        window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
-                    else:
-                        check_panel.fill((0, 0, 0, 0))
-                        check_panel.blit(text_correct[0], ((check_panel.get_width() // 2) - text_correct[1].width // 2, check_panel.get_height() // 2 - text_correct[1].height // 2))
-                        pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
-                        window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
+                    checked = True
+                    refresh = True
 
+        if list[1]:
+            guardar_matriz(solutionBoard, states_board, states)
+            list[1] = False
+        
         if refresh == True:
             refresh = False
             offset_contraints_x = (offset_x - surface_h_constraints.get_width()) * (surface_h_constraints.get_width() / (grid_render.get_width() + surface_h_constraints.get_width()))
@@ -203,4 +203,17 @@ def game(window, window_size, font, clock, n_cols, n_rows):
             window.blit(surface_h_constraints, (max(offset_contraints_x, offset_x - surface_h_constraints.get_width()), offset_y))
 
             window.blit(img,(0,0),((0,0),(max(offset_contraints_x + surface_h_constraints.get_width(), offset_x), max(offset_contraints_y + surface_v_constraints.get_height(), offset_y))))
+
+            if checked:
+                if not check(board, solutionBoard):
+                    check_panel.fill((0, 0, 0, 0))
+                    check_panel.blit(text_wrong[0], ((check_panel.get_width() // 2) - text_wrong[1].width // 2, check_panel.get_height() // 2 - text_wrong[1].height // 2))
+                    pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
+                    window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
+                else:
+                    check_panel.fill((0, 0, 0, 0))
+                    check_panel.blit(text_correct[0], ((check_panel.get_width() // 2) - text_correct[1].width // 2, check_panel.get_height() // 2 - text_correct[1].height // 2))
+                    pygame.draw.rect(window, (0, 0, 0), (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5, window_size[0] // 4, window_size[1] // 16), 0, 5)
+                    window.blit(check_panel, (window_size[0] - check_panel.get_width() - 5, window_size[1] - check_panel.get_height() * 1.5))
+
             pygame.display.flip()

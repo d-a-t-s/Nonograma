@@ -28,6 +28,7 @@ def menuEsc(window, width, height, font, clock):
     panel.fill((50,50,50,10))
     panel.blit(menu, (width//4, 25))
 
+    returns = [False, False]
     running = True
     while running:
         clock.tick(60)
@@ -39,13 +40,17 @@ def menuEsc(window, width, height, font, clock):
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if resume_button.isOver(pos):
                     running = False
+                    return returns
 
                 elif save_button.isOver(pos):
-                    return True
+                    running = False
+                    returns[1] = True
+                    return returns
 
                 elif quit_button.isOver(pos):
                     running = False
-                    return True
+                    returns[0] = True
+                    return returns
             
             elif event.type == pygame.MOUSEMOTION:
                 if resume_button.isOver(pos):
