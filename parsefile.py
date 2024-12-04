@@ -5,7 +5,7 @@ def parsefile(file_path):
         width, height = int(grid_size[0]), int(grid_size[1])
         
         palette = []
-        for i in range(8):
+        for i in range(4):
             line = file.readline().strip().split(';')
             palette.append((int(line[1]), int(line[2]), int(line[3])))
 
